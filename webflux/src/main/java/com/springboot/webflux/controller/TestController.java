@@ -1,6 +1,7 @@
 package com.springboot.webflux.controller;
 
 import com.springboot.webflux.dto.TestRequest;
+import com.springboot.webflux.security.AuthToken;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ public class TestController {
         this.webClient = webClientBuilder.baseUrl("http://127.0.0.1:5000").build();
     }
 
-    @GetMapping("/test")
+    @GetMapping("/")
     public Mono<String> print() {
         return Mono.just("Hello Webflux!!");
     }
@@ -28,16 +29,23 @@ public class TestController {
             @RequestBody TestRequest testRequest
             ) {
 
-        String contents = testRequest.getContents();
-
-        System.out.println(contents);
-
         return webClient.post()
                 .uri("/api/tospring")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", AuthToken.token)
                 .bodyValue(testRequest)
                 .retrieve()
                 .bodyToMono(String.class);
+    }
+
+    @GetMapping("/servertoken")
+    public Mono<String> getToken() {
+
+        return webClient.get()
+                .uri("/auth/token")
+                .retrieve()
+                .bodyToMono(String.class)
+                .doOnNext(token -> AuthToken.token = token);
     }
 }
