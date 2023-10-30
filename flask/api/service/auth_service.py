@@ -4,6 +4,7 @@ import datetime
 import jwt
 import uuid
 
+
 class AuthKey():
     def __init__(self):
         self.key = uuid.uuid4().hex
@@ -49,10 +50,16 @@ def token_required(f):
             print("토큰이 유효하지 않음 : 접근 거부")
             return jsonify("Token is invalid : access denied")
         
-        payload = jwt.decode(token,  current_app.config['JWT_SECRET_KEY'], current_app.config['ALGORITHM'])
+        payload = jwt.decode(token, current_app.config['JWT_SECRET_KEY'], current_app.config['ALGORITHM'])
 
         print(payload)
 
+        print("1")
+        if('authKey' not in locals() and 'authKey' not in globals()):
+            print("토큰이 생성되지 않음 : 접근 거부")
+            return jsonify("Token not created : access denied")
+        
+        print("2")
         if(payload['key'] != authKey.key):
             print("토큰이 유효하지 않음 : 접근 거부")
             return jsonify("Token is invalid : access denied")
