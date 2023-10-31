@@ -1,23 +1,19 @@
 package com.springboot.webflux.controller;
 
 import com.springboot.webflux.dto.TestRequest;
-import com.springboot.webflux.security.AuthToken;
-import org.springframework.http.MediaType;
+import com.springboot.webflux.service.TestService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @RestController
+@RequiredArgsConstructor
 public class TestController {
 
-    private final WebClient webClient;
-
-    public TestController(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://127.0.0.1:5000").build();
-    }
+    private final TestService testService;
 
     @GetMapping("/")
     public Mono<String> print() {
@@ -27,25 +23,12 @@ public class TestController {
     @PostMapping("/fromflask")
     public Mono<String> flask(
             @RequestBody TestRequest testRequest
-            ) {
-
-        return webClient.post()
-                .uri("/api/tospring")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", AuthToken.token)
-                .bodyValue(testRequest)
-                .retrieve()
-                .bodyToMono(String.class);
+    ) {
+        return testService.fromFlask(testRequest);
     }
 
     @GetMapping("/servertoken")
     public Mono<String> getToken() {
-
-        return webClient.get()
-                .uri("/auth/token")
-                .retrieve()
-                .bodyToMono(String.class)
-                .doOnNext(token -> AuthToken.token = token);
+        return testService.getToken();
     }
 }
