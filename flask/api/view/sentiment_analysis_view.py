@@ -1,10 +1,9 @@
-from flask import Blueprint, jsonify, request
-from api.service import sentiment_analysis_service
+from flask import Blueprint, jsonify, request, current_app
+from api.service.tasks import sentiment_predict
 from api.service.auth_service import check_whitelist, token_required
 import json
 
 api = Blueprint("api", __name__, url_prefix="/api")
-
 
 @api.route('/home')
 def home():
@@ -18,6 +17,5 @@ def spring():
     if len(params) == 0:
         return 'No parameter'
     contents = params['contents']
-    predict = sentiment_analysis_service.sentiment_predict(contents)
-    return jsonify(predict)
-    
+    result = sentiment_predict.delay(contents)
+    return jsonify(result.get())

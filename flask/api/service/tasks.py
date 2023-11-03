@@ -4,8 +4,9 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import load_model
 from flask import current_app
+import os
 
-# tensorflow, konlpy 설치
+from celery import shared_task
 
 # 정수 인코딩한 데이터 이름
 DATA_CONFIGS = 'data_configs.json'
@@ -16,7 +17,9 @@ tokenizer = Tokenizer()
 loaded_model = load_model('./static/best_model.h5')
 prepro_configs = json.load(open('./static/'+DATA_CONFIGS, 'r', encoding='UTF-8'))
 
+@shared_task(ignore_result=False)
 def sentiment_predict(new_sentence):
+
     word_vocab = prepro_configs['vocab']
     tokenizer.fit_on_texts(word_vocab)
     new_sentence = okt.morphs(new_sentence, stem=True) # 토큰화
