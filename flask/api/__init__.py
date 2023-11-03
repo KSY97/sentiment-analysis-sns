@@ -1,43 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask
 from celery import Celery, Task
-# from api.view import sentiment_analysis_view, auth_view
-
-
-# def make_celery(app):
-#     celery = Celery(
-#         app.import_name,
-#         backend=BROKER_URL,
-#         broker=CELERY_RESULT_BACKEND
-#     )
-#     celery.conf.update(app.config)
-
-#     class ContextTask(celery.Task):
-#         def __call__(self, *args, **kwargs):
-#             with app.app_context():
-#                 return self.run(*args, **kwargs)
-
-#     celery.Task = ContextTask
-#     return celery
-
-# app = Flask(__name__)
-# celery = make_celery(app)
-
-
-
-# # Auth
-# app.config['WHITE_LIST'] = ["127.0.0.1"]
-# app.config['JWT_SECRET_KEY'] = "KSY_sentiment_analysis_app"
-# app.config['ALGORITHM'] = "HS256"
-
-# # Api
-# # 불용어
-# app.config['STOPWORDS'] = ['의','가','이','은','들','는','좀','잘','걍','과','도','를','으로','자','에','와','한','하다']
-# # 최대 문장 길이 (학습 데이터 기준)
-# app.config['MAX_SENTENCE_LEN'] = 30
-
-# app.register_blueprint(sentiment_analysis_view.api)
-# app.register_blueprint(auth_view.auth)
-
 
 def create_app() -> Flask:
     app = Flask(__name__)

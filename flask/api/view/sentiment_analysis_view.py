@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request
 from api.service.tasks import sentiment_predict
 from api.service.auth_service import check_whitelist, token_required
 import json

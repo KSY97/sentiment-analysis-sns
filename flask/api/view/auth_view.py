@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint
 from api.service.auth_service import check_whitelist, generate_auth_key, generate_jwt_token
 
 auth = Blueprint("auth", __name__, url_prefix="/auth")
