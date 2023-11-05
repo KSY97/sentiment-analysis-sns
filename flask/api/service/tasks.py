@@ -27,8 +27,15 @@ def sentiment_predict(new_sentence):
     pad_new = pad_sequences(encoded, maxlen = current_app.config['MAX_SENTENCE_LEN']) # 패딩
     score = float(loaded_model.predict(pad_new)) # 예측
     if(score > 0.5):
-        data = {'predict' : 'positive', 'score' : '{:.2f}'.format(score * 100)}
-        return data
+        prediction = 'positive'
+        score_percent = score * 100
     else:
-        data = {'predict' : 'negative', 'score' : '{:.2f}'.format((1-score) * 100)}
-        return data
+        prediction = 'negative'
+        score_percent = (1 - score) * 100
+    
+    result = {
+        'predict': prediction,
+        'score': f'{score_percent:.2f}'
+    }
+    
+    return result

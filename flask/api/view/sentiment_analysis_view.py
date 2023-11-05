@@ -10,7 +10,6 @@ def home():
     return 'This is api home!'
 
 @api.route('/tospring', methods = ['POST'])
-@check_whitelist
 @token_required
 def spring():
     params = json.loads(request.get_data())
