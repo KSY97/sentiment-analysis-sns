@@ -1,28 +1,8 @@
 from functools import wraps
 from flask import request, jsonify, current_app
+from api.service.auth_service import authKey;
 import datetime
 import jwt
-import uuid
-
-class AuthKey():
-    def __init__(self):
-        self.key = uuid.uuid4().hex
-
-def generate_auth_key():
-    global authKey
-    authKey = AuthKey()
-    return authKey
-
-def generate_jwt_token(key):
-
-    payload = {
-         'key': key,
-         'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
-        }
-    
-    token = jwt.encode(payload, current_app.config['JWT_SECRET_KEY'], current_app.config['ALGORITHM'])
-
-    return token
 
 # decorator 함수
 def check_whitelist(f):

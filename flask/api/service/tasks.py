@@ -35,7 +35,7 @@ def sentiment_predict(new_sentence):
     
     result = {
         'predict': prediction,
-        'score': f'{score_percent:.2f}'
+        'percentage': f'{score_percent:.2f}'
     }
     
     return result

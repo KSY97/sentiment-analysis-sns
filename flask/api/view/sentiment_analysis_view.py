@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from api.service.tasks import sentiment_predict
-from api.service.auth_service import check_whitelist, token_required
+from api.service.auth_service import token_required
 import json
 
 api = Blueprint("api", __name__, url_prefix="/api")
