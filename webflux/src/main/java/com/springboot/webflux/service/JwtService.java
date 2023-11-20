@@ -17,8 +17,8 @@ public class JwtService {
 
     private final SecretKey secretKey;
 
-    Long accessTokenValidTime = 1000 * 60L * 60L; // 60분
-    Long refreshTokenValidTime = 1000L * 60L * 60L * 24L; // 24시간
+    @Value("${jwtExpTime}")
+    private Long accessTokenValidTime;
 
     public JwtService(@Value("${jwtSecretKey}") String key) {
         var secret = Base64.getEncoder().encodeToString(key.getBytes());
@@ -39,6 +39,7 @@ public class JwtService {
         Claims claims = Jwts.claims().setSubject("access_token");
         claims.put("uid", uid);
         Date currentTime = new Date();
+        System.out.println("accessTokenValidTime = " + accessTokenValidTime);
 
         return Jwts.builder()
                 .setClaims(claims)
