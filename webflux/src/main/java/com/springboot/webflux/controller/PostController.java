@@ -2,8 +2,10 @@ package com.springboot.webflux.controller;
 
 import com.springboot.webflux.dto.PostRequest;
 import com.springboot.webflux.dto.PostResponse;
+import com.springboot.webflux.security.CustomUserPrincipal;
 import com.springboot.webflux.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,23 +19,26 @@ public class PostController {
 
     @PostMapping("/write")
     public Mono<PostResponse> write(
-            @RequestBody PostRequest.Write request
+            @RequestBody PostRequest.Write request,
+            @AuthenticationPrincipal CustomUserPrincipal principal
     ){
-        return postService.write(request);
+        return postService.write(request, principal.getMember().getMemberId());
     }
 
     @PutMapping("/edit")
     public Mono<PostResponse> edit(
-            @RequestBody PostRequest.Edit request
+            @RequestBody PostRequest.Edit request,
+            @AuthenticationPrincipal CustomUserPrincipal principal
     ){
-        return postService.edit(request);
+        return postService.edit(request, principal.getMember().getMemberId());
     }
 
     @DeleteMapping("/delete")
     public Mono<Void> delete(
-            @RequestParam("post_id") Long postId
+            @RequestParam("post_id") Long postId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
     ){
-        return postService.delete(postId);
+        return postService.delete(postId, principal.getMember().getMemberId());
     }
 
     @GetMapping("/view")

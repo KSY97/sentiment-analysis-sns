@@ -2,8 +2,10 @@ package com.springboot.webflux.controller;
 
 import com.springboot.webflux.dto.MemberRequest;
 import com.springboot.webflux.dto.MemberResponse;
+import com.springboot.webflux.security.CustomUserPrincipal;
 import com.springboot.webflux.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -29,7 +31,7 @@ public class MemberController {
     }
 
     @PostMapping("/signin")
-    public Mono<MemberResponse> signIn(
+    public Mono<String> signIn(
             @RequestBody MemberRequest.SignIn request
     ){
         return memberService.signIn(request);
@@ -37,8 +39,9 @@ public class MemberController {
 
     @PutMapping("/edit")
     public Mono<MemberResponse> edit(
-            @RequestBody MemberRequest.Edit request
+            @RequestBody MemberRequest.Edit request,
+            @AuthenticationPrincipal CustomUserPrincipal principal
     ){
-        return memberService.edit(request);
+        return memberService.edit(request, principal.getMember().getMemberId());
     }
 }

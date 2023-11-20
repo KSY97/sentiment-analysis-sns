@@ -6,6 +6,7 @@ from tensorflow.keras.models import load_model
 from flask import current_app
 
 from celery import shared_task
+import time
 
 # 정수 인코딩한 데이터 이름
 DATA_CONFIGS = 'data_configs.json'

@@ -6,7 +6,7 @@ import com.springboot.webflux.repository.MemberRepository;
 import com.springboot.webflux.repository.PostRepository;
 import com.springboot.webflux.repository.entity.Comment;
 import com.springboot.webflux.repository.entity.Post;
-import com.springboot.webflux.security.AuthToken;
+import com.springboot.webflux.security.FlaskAuthToken;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -36,7 +36,7 @@ public class PredictionService {
                 .uri("/api/tospring")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AuthToken.token)
+                .header(HttpHeaders.AUTHORIZATION, FlaskAuthToken.token)
                 .bodyValue(predictionRequest)
                 .retrieve()
                 .bodyToMono(String.class);
@@ -47,12 +47,12 @@ public class PredictionService {
                 .uri("/auth/token")
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnNext(token -> AuthToken.token = token);
+                .doOnNext(token -> FlaskAuthToken.token = token);
     }
 
     public Mono<String> callApi(PredictionRequest predictionRequest) {
 
-        if(AuthToken.token == null){
+        if(FlaskAuthToken.token == null){
             return getToken().doOnNext(token ->{})
                     .flatMap(token -> sentimentAnalysis(predictionRequest));
         } else {

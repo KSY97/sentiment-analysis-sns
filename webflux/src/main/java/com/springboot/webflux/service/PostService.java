@@ -17,20 +17,36 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final PredictionService.PostPredict postPredictionService;
 
-    public Mono<PostResponse> write(PostRequest.Write postRequest) {
+    public Mono<PostResponse> write(PostRequest.Write postRequest, Long memberId) {
 
         return memberRepository.findById(postRequest.getMemberId())
                 .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 사용자 입니다.")))
+                .flatMap(member -> {
+                    if(!(memberId == null)){
+                        if(!(member.getMemberId() == memberId)){
+                            return Mono.error(new RuntimeException("권한이 없습니다."));
+                        }
+                    }
+                    return Mono.just(member);
+                })
                 .flatMap(member -> postRepository.save(postRequest.toEntity()))
                 .flatMap(savedPost -> postPredictionService.callApiAndSave(savedPost))
                 .map(PostResponse::fromEntity);
 
     }
 
-    public Mono<PostResponse> edit(PostRequest.Edit postRequest){
+    public Mono<PostResponse> edit(PostRequest.Edit postRequest, Long memberId){
 
         return postRepository.findById(postRequest.getPostId())
                 .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 게시물 입니다.")))
+                .flatMap(post -> {
+                    if(!(memberId == null)){
+                        if(!(post.getMemberId() == memberId)){
+                            return Mono.error(new RuntimeException("권한이 없습니다."));
+                        }
+                    }
+                    return Mono.just(post);
+                })
                 .flatMap(post -> {
                     post.updatePost(postRequest.getContents());
                     return postRepository.save(post);
@@ -39,10 +55,18 @@ public class PostService {
                 .map(PostResponse::fromEntity);
     }
 
-    public Mono<Void> delete(Long postId){
+    public Mono<Void> delete(Long postId, Long memberId){
 
         return postRepository.findById(postId)
                 .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 게시물 입니다.")))
+                .flatMap(post -> {
+                    if(!(memberId == null)){
+                        if(!(post.getMemberId() == memberId)){
+                            return Mono.error(new RuntimeException("권한이 없습니다."));
+                        }
+                    }
+                    return Mono.just(post);
+                })
                 .flatMap(postRepository::delete);
     }
 
