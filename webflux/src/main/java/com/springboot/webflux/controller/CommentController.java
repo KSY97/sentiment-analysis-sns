@@ -2,8 +2,10 @@ package com.springboot.webflux.controller;
 
 import com.springboot.webflux.dto.CommentRequest;
 import com.springboot.webflux.dto.CommentResponse;
+import com.springboot.webflux.security.CustomUserPrincipal;
 import com.springboot.webflux.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,23 +19,26 @@ public class CommentController {
 
     @PostMapping("/write")
     public Mono<CommentResponse> write(
-            @RequestBody CommentRequest.Write request
+            @RequestBody CommentRequest.Write request,
+            @AuthenticationPrincipal CustomUserPrincipal principal
     ){
-        return commentService.write(request);
+        return commentService.write(request, principal.getMember().getMemberId());
     }
 
     @PutMapping("/edit")
     public Mono<CommentResponse> edit(
-            @RequestBody CommentRequest.Edit request
+            @RequestBody CommentRequest.Edit request,
+            @AuthenticationPrincipal CustomUserPrincipal principal
     ){
-        return commentService.edit(request);
+        return commentService.edit(request, principal.getMember().getMemberId());
     }
 
     @DeleteMapping("/delete")
     public Mono<Void> delete(
-            @RequestParam("comment_id") Long postId
+            @RequestParam("comment_id") Long postId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
     ){
-        return commentService.delete(postId);
+        return commentService.delete(postId, principal.getMember().getMemberId());
     }
 
     @GetMapping("/view")

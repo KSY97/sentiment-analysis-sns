@@ -19,10 +19,18 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final PredictionService.CommentPredict commentPredictionService;
 
-    public Mono<CommentResponse> write(CommentRequest.Write commentRequest){
+    public Mono<CommentResponse> write(CommentRequest.Write commentRequest, Long memberId){
 
         return memberRepository.findById(commentRequest.getMemberId())
                 .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 사용자 입니다.")))
+                .flatMap(member -> {
+                    if(!(memberId == null)){
+                        if(!(member.getMemberId() == memberId)){
+                            return Mono.error(new RuntimeException("권한이 없습니다."));
+                        }
+                    }
+                    return Mono.just(member);
+                })
                 .flatMap(member ->
                         postRepository.findById(commentRequest.getPostId())
                                 .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 게시글 입니다.")))
@@ -32,10 +40,18 @@ public class CommentService {
                 .map(CommentResponse::fromEntity);
     }
 
-    public Mono<CommentResponse> edit(CommentRequest.Edit commentRequest){
+    public Mono<CommentResponse> edit(CommentRequest.Edit commentRequest, Long memberId){
 
         return commentRepository.findById(commentRequest.getCommentId())
                 .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 댓글 입니다.")))
+                .flatMap(comment -> {
+                    if(!(memberId == null)){
+                        if(!(comment.getMemberId() == memberId)){
+                            return Mono.error(new RuntimeException("권한이 없습니다."));
+                        }
+                    }
+                    return Mono.just(comment);
+                })
                 .flatMap(comment -> {
                     comment.updateComment(commentRequest.getContents());
                     return commentRepository.save(comment);
@@ -44,10 +60,18 @@ public class CommentService {
                 .map(CommentResponse::fromEntity);
     }
 
-    public Mono<Void> delete(Long commentId){
+    public Mono<Void> delete(Long commentId, Long memberId){
 
         return commentRepository.findById(commentId)
                 .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 댓글 입니다.")))
+                .flatMap(comment -> {
+                    if(!(memberId == null)){
+                        if(!(comment.getMemberId() == memberId)){
+                            return Mono.error(new RuntimeException("권한이 없습니다."));
+                        }
+                    }
+                    return Mono.just(comment);
+                })
                 .flatMap(commentRepository::delete);
     }
 

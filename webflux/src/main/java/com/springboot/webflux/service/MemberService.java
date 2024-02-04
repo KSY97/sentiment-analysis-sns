@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final JwtService jwtService;
 
     public Mono<MemberResponse> findById(Long memberId){
         return memberRepository.findById(memberId)
@@ -31,17 +32,25 @@ public class MemberService {
                 });
     }
 
-    public Mono<MemberResponse> signIn(MemberRequest.SignIn memberRequest){
+    public Mono<String> signIn(MemberRequest.SignIn memberRequest){
 
         return memberRepository.findByUsername(memberRequest.getUsername())
                 .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 사용자명 입니다.")))
-                .map(MemberResponse::fromEntity);
+                .flatMap(member -> Mono.just(jwtService.generateAccessToken(member.getMemberId())));
     }
 
-    public Mono<MemberResponse> edit(MemberRequest.Edit memberRequest){
+    public Mono<MemberResponse> edit(MemberRequest.Edit memberRequest, Long memberId){
 
         return memberRepository.findById(memberRequest.getMemberId())
                 .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 사용자 입니다.")))
+                .flatMap(member -> {
+                    if(!(memberId == null)){
+                        if(!(member.getMemberId() == memberId)){
+                            return Mono.error(new RuntimeException("권한이 없습니다."));
+                        }
+                    }
+                    return Mono.just(member);
+                })
                 .flatMap(member -> {
                     member.updateInfo(memberRequest.getUsername(), memberRequest.getPassword());
                     return memberRepository.save(member);
