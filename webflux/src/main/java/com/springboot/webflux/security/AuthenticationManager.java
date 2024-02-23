@@ -29,7 +29,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
                 .switchIfEmpty(Mono.empty())
                 .flatMap(valid -> memberRepository.findById(uid))
                 .map(user -> new UsernamePasswordAuthenticationToken(
-                        new CustomUserPrincipal(user),
+                        user.getUsername(),
                         user.getPassword(),
                         new ArrayList<>())
                 );

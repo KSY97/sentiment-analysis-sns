@@ -1,57 +1,67 @@
 package com.springboot.webflux.controller;
 
-import com.springboot.webflux.dto.PostRequest;
+import com.springboot.webflux.dto.PostEditRequest;
+import com.springboot.webflux.dto.PostRegisterRequest;
 import com.springboot.webflux.dto.PostResponse;
-import com.springboot.webflux.security.CustomUserPrincipal;
 import com.springboot.webflux.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
+
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
 
-    @PostMapping("/write")
+    @PostMapping
     public Mono<PostResponse> write(
-            @RequestBody PostRequest.Write request,
-            @AuthenticationPrincipal CustomUserPrincipal principal
+            @RequestBody PostRegisterRequest request,
+            Mono<Principal> principalMono
     ){
-        return postService.write(request, principal.getMember().getMemberId());
+        return principalMono
+                .flatMap(principal -> postService.write(request, principal.getName()))
+                .map(PostResponse::fromEntity);
     }
 
-    @PutMapping("/edit")
+    @PatchMapping
     public Mono<PostResponse> edit(
-            @RequestBody PostRequest.Edit request,
-            @AuthenticationPrincipal CustomUserPrincipal principal
+            @RequestBody PostEditRequest request,
+            Mono<Principal> principalMono
     ){
-        return postService.edit(request, principal.getMember().getMemberId());
+        return principalMono
+                .flatMap(principal -> postService.edit(request, principal.getName()))
+                .map(PostResponse::fromEntity);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/{postId}")
     public Mono<Void> delete(
-            @RequestParam("post_id") Long postId,
-            @AuthenticationPrincipal CustomUserPrincipal principal
+            @PathVariable Long postId,
+            Mono<Principal> principalMono
     ){
-        return postService.delete(postId, principal.getMember().getMemberId());
+        return principalMono
+                .flatMap(principal -> postService.delete(postId, principal.getName()));
     }
 
-    @GetMapping("/view")
+    @GetMapping("/{postId}")
     public Mono<PostResponse> view(
-            @RequestParam("post_id") Long postId
+            @PathVariable Long postId
     ){
-        return postService.findById(postId);
+        return postService.findById(postId)
+                .map(PostResponse::fromEntity);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/search/member/{memberId}")
     public Flux<PostResponse> findByMemberId(
-            @RequestParam("member_id") Long memberId
+            @PathVariable Long memberId
     ){
-        return postService.findByMemberId(memberId);
+        return postService.findByMemberId(memberId)
+                .map(PostResponse::fromEntity);
     }
 }

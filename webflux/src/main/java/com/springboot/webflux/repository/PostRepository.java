@@ -1,6 +1,6 @@
 package com.springboot.webflux.repository;
 
-import com.springboot.webflux.repository.entity.Post;
+import com.springboot.webflux.entity.Post;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

@@ -1,14 +1,15 @@
 package com.springboot.webflux.controller;
 
-import com.springboot.webflux.dto.CommentRequest;
+import com.springboot.webflux.dto.CommentEditRequest;
+import com.springboot.webflux.dto.CommentRegisterRequest;
 import com.springboot.webflux.dto.CommentResponse;
-import com.springboot.webflux.security.CustomUserPrincipal;
 import com.springboot.webflux.service.CommentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,49 +18,57 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @PostMapping("/write")
+    @PostMapping
     public Mono<CommentResponse> write(
-            @RequestBody CommentRequest.Write request,
-            @AuthenticationPrincipal CustomUserPrincipal principal
+            @RequestBody CommentRegisterRequest request,
+            Mono<Principal> principalMono
     ){
-        return commentService.write(request, principal.getMember().getMemberId());
+        return principalMono
+                .flatMap(principal -> commentService.write(request, principal.getName()))
+                .map(CommentResponse::fromEntity);
     }
 
-    @PutMapping("/edit")
+    @PatchMapping
     public Mono<CommentResponse> edit(
-            @RequestBody CommentRequest.Edit request,
-            @AuthenticationPrincipal CustomUserPrincipal principal
+            @RequestBody CommentEditRequest request,
+            Mono<Principal> principalMono
     ){
-        return commentService.edit(request, principal.getMember().getMemberId());
+        return principalMono
+                .flatMap(principal -> commentService.edit(request, principal.getName()))
+                .map(CommentResponse::fromEntity);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/{commentId}")
     public Mono<Void> delete(
-            @RequestParam("comment_id") Long postId,
-            @AuthenticationPrincipal CustomUserPrincipal principal
+            @PathVariable Long commentId,
+            Mono<Principal> principalMono
     ){
-        return commentService.delete(postId, principal.getMember().getMemberId());
+        return principalMono
+                .flatMap(principal -> commentService.delete(commentId, principal.getName()));
     }
 
-    @GetMapping("/view")
+    @GetMapping("/{commentId}")
     public Mono<CommentResponse> view(
-            @RequestParam("comment_id") Long commentId
+            @PathVariable Long commentId
     ){
-        return commentService.findById(commentId);
+        return commentService.findById(commentId)
+                .map(CommentResponse::fromEntity);
     }
 
-    @GetMapping("/search/member")
+    @GetMapping("/search/member/{memberId}")
     public Flux<CommentResponse> findByMemberId(
-            @RequestParam("member_id") Long memberId
+            @PathVariable Long memberId
     ){
-        return commentService.findByMemberId(memberId);
+        return commentService.findByMemberId(memberId)
+                .map(CommentResponse::fromEntity);
     }
 
-    @GetMapping("/search/posts")
+    @GetMapping("/search/posts/{postId}")
     public Flux<CommentResponse> findByPostId(
-            @RequestParam("post_id") Long postId
+            @PathVariable Long postId
     ){
-        return commentService.findByPostId(postId);
+        return commentService.findByPostId(postId)
+                .map(CommentResponse::fromEntity);
     }
 
 }

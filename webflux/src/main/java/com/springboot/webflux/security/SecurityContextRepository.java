@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class SecurityContextRepository implements ServerSecurityContextRepository {
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
     public SecurityContextRepository(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
