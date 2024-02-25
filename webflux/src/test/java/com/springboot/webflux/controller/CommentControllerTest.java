@@ -66,7 +66,7 @@ public class CommentControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("comment 등록")
-    class writeComment{
+    class WriteComment{
 
         @Test
         @DisplayName("comment 등록 성공")
@@ -103,7 +103,7 @@ public class CommentControllerTest {
 
         @Test
         @DisplayName("comment 등록 실패 - 유효하지 않은 요청")
-        void failWriteInvalidRequest(){
+        void failWrite_InvalidRequest(){
             CommentRegisterRequest commentRegisterRequest = createRegisterRequest();
 
             when(commentService.write(any(CommentRegisterRequest.class), anyString()))
@@ -121,7 +121,7 @@ public class CommentControllerTest {
 
         @Test
         @DisplayName("comment 등록 실패 - 게시글을 찾지 못함")
-        void failWritePostNotFound(){
+        void failWrite_PostNotFound(){
             CommentRegisterRequest commentRegisterRequest = createRegisterRequest();
 
             when(commentService.write(any(CommentRegisterRequest.class), anyString()))
@@ -141,7 +141,7 @@ public class CommentControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("comment 수정")
-    class editComment{
+    class EditComment{
 
         @Test
         @DisplayName("comment 수정 성공")
@@ -180,7 +180,7 @@ public class CommentControllerTest {
 
         @Test
         @DisplayName("comment 수정 실패 - 유효하지 않은 요청")
-        void failEditInvalidRequest(){
+        void failEdit_InvalidRequest(){
             CommentEditRequest commentEditRequest = commentEditRequest();
 
             when(commentService.edit(any(CommentEditRequest.class), anyString()))
@@ -201,7 +201,7 @@ public class CommentControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("comment 삭제")
-    class deleteComment{
+    class DeleteComment{
 
         @Test
         @DisplayName("comment 삭제 성공 ")
@@ -219,7 +219,7 @@ public class CommentControllerTest {
 
         @Test
         @DisplayName("comment 삭제 실패 - 유효하지 않은 요청")
-        void failDeleteInvalidRequest(){
+        void failDelete_InvalidRequest(){
             when(commentService.delete(anyLong(), anyString()))
                     .thenReturn(Mono.error(new RuntimeException(INVALID_REQUEST.getMessage())));
 
@@ -235,7 +235,7 @@ public class CommentControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("comment 조회")
-    class viewComment{
+    class ViewComment{
 
         @Test
         @DisplayName("comment 조회 성공")
@@ -269,7 +269,7 @@ public class CommentControllerTest {
 
         @Test
         @DisplayName("comment 조회 실패 - 댓글을 찾지 못함")
-        void failView(){
+        void failView_CommentNotFound(){
             when(commentService.findById(1L))
                     .thenReturn(Mono.error(new RuntimeException(COMMENT_NOT_FOUND.getMessage())));
 
@@ -285,7 +285,7 @@ public class CommentControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("memberId로 comment 조회")
-    class findByMemberIdComment{
+    class FindByMemberIdComment{
 
         @Test
         @DisplayName("memberId로 comment 조회 성공")
@@ -332,7 +332,7 @@ public class CommentControllerTest {
 
         @Test
         @DisplayName("memberId로 comment 조회 실패 - 멤버를 찾지 못함")
-        void failFindMemberNotFound(){
+        void failFind_MemberNotFound(){
 
             when(commentService.findByMemberId(anyLong()))
                     .thenReturn(Flux.error(new RuntimeException(MEMBER_NOT_FOUND.getMessage())));
@@ -349,7 +349,7 @@ public class CommentControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("postId로 comment 검색")
-    class findByPostIdComment{
+    class FindByPostIdComment{
 
         @Test
         @DisplayName("postId로 comment 검색 성공")
@@ -396,7 +396,7 @@ public class CommentControllerTest {
 
         @Test
         @DisplayName("postId로 comment 검색 실패 - 게시글을 찾지 못함")
-        void failFindMemberNotFound(){
+        void failFind_MemberNotFound(){
 
             when(commentService.findByPostId(anyLong()))
                     .thenReturn(Flux.error(new RuntimeException(POST_NOT_FOUND.getMessage())));

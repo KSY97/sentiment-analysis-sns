@@ -77,7 +77,7 @@ public class PostControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("post 등록")
-    class writePost{
+    class WritePost{
 
         @Test
         @DisplayName("post 등록 성공")
@@ -110,7 +110,7 @@ public class PostControllerTest {
 
         @Test
         @DisplayName("post 등록 실패 - 유효하지 않은 요청")
-        void failWriteInvalidRequest(){
+        void failWrite_InvalidRequest(){
             PostRegisterRequest postRegisterRequest = createRegisterRequest();
 
             when(postService.write(any(PostRegisterRequest.class), anyString()))
@@ -129,7 +129,7 @@ public class PostControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("post 수정")
-    class editPost{
+    class EditPost{
 
         @Test
         @DisplayName("post 수정 성공")
@@ -162,7 +162,7 @@ public class PostControllerTest {
 
         @Test
         @DisplayName("post 수정 실패 - 유효하지 않은 요청")
-        void failEditInvalidRequest(){
+        void failEdit_InvalidRequest(){
             PostEditRequest postEditRequest = createEditRequest();
 
             when(postService.edit(any(PostEditRequest.class), anyString()))
@@ -181,7 +181,7 @@ public class PostControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("post 삭제")
-    class deletePost{
+    class DeletePost{
 
         @Test
         @DisplayName("post 삭제 성공")
@@ -199,7 +199,7 @@ public class PostControllerTest {
 
         @Test
         @DisplayName("post 삭제 실패 - 유효하지 않은 요청")
-        void failDeleteInvalidRequest(){
+        void failDelete_InvalidRequest(){
             when(postService.delete(anyLong(), anyString()))
                     .thenReturn(Mono.error(new RuntimeException(INVALID_REQUEST.getMessage())));
 
@@ -215,7 +215,7 @@ public class PostControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("post 조회")
-    class viewPost{
+    class ViewPost{
 
         @Test
         @DisplayName("post 조회 성공")
@@ -246,7 +246,7 @@ public class PostControllerTest {
 
         @Test
         @DisplayName("post 조회 실패 - 게시글을 찾지 못함")
-        void failViewPostNotFound(){
+        void failView_PostNotFound(){
             when(postService.findById(anyLong()))
                     .thenReturn(Mono.error(new RuntimeException(POST_NOT_FOUND.getMessage())));
 
@@ -262,7 +262,7 @@ public class PostControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("memberId로 post 조회")
-    class findByMemberIdPost{
+    class FindByMemberIdPost{
 
         @Test
         @DisplayName("memberId로 post 조회 성공")
@@ -302,7 +302,7 @@ public class PostControllerTest {
 
         @Test
         @DisplayName("memberId로 post 조회 실패 - 멤버를 찾지 못함")
-        void failFindByMemberIdMemberNotFound(){
+        void failFindByMemberId_MemberNotFound(){
             when(postService.findByMemberId(anyLong()))
                     .thenReturn(Flux.error(new RuntimeException(MEMBER_NOT_FOUND.getMessage())));
 

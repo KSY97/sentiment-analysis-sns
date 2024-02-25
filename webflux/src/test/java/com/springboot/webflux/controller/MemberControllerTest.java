@@ -81,7 +81,7 @@ public class MemberControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("memberId로 member 조회")
-    class findByIdMember{
+    class FindByIdMember{
 
         @Test
         @DisplayName("memberId로 member 조회 성공")
@@ -112,7 +112,7 @@ public class MemberControllerTest {
 
         @Test
         @DisplayName("memberId로 member 조회 실패 - 멤버를 찾지 못함")
-        void failFindMemberNotFound(){
+        void failFind_MemberNotFound(){
 
             when(memberService.findById(anyLong()))
                     .thenReturn(Mono.error(new RuntimeException(MEMBER_NOT_FOUND.getMessage())));
@@ -130,7 +130,7 @@ public class MemberControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("member 회원가입")
-    class signUpMember {
+    class SignUpMember {
 
         @Test
         @DisplayName("member 회원가입 성공")
@@ -163,7 +163,7 @@ public class MemberControllerTest {
 
         @Test
         @DisplayName("member 회원가입 실패 - 이미 존재하는 사용자명")
-        void failSignUpMemberAlreadyExists() {
+        void failSignUp_MemberAlreadyExists() {
             MemberSignUpRequest memberSignUpRequest = createSignUpRequest();
 
             when(memberService.signUp(any(MemberSignUpRequest.class)))
@@ -182,7 +182,7 @@ public class MemberControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("member 로그인")
-    class signInMember {
+    class SignInMember {
 
         @Test
         @DisplayName("member 로그인 성공")
@@ -204,7 +204,7 @@ public class MemberControllerTest {
 
         @Test
         @DisplayName("member 로그인 실패 - 멤버를 찾지 못함")
-        void failSignInMemberNotFound() {
+        void failSignIn_MemberNotFound() {
             MemberSignInRequest memberSignInRequest = createSignInRequest();
 
             when(memberService.signIn(any(MemberSignInRequest.class)))
@@ -223,7 +223,7 @@ public class MemberControllerTest {
     @Nested
     @WithMockUser
     @DisplayName("member 정보 수정")
-    class editMember {
+    class EditMember {
 
         @Test
         @DisplayName("member 정보 수정 성공")
@@ -256,7 +256,7 @@ public class MemberControllerTest {
 
         @Test
         @DisplayName("member 정보 수정 실패 - 유효하지 않은 요청")
-        void failEditInvalidRequest() {
+        void failEdit_InvalidRequest() {
             MemberEditRequest memberEditRequest = createEditRequest();
 
             when(memberService.edit(any(MemberEditRequest.class), anyString()))
