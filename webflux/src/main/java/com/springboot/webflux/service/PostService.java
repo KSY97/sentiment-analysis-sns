@@ -65,7 +65,7 @@ public class PostService {
     public Flux<Post> findByMemberId(Long memberId){
 
         return memberRepository.findById(memberId)
-                .flatMapMany(member -> postRepository.findByMemberId(member.getMemberId()))
-                .switchIfEmpty(Flux.error(new RuntimeException(MEMBER_NOT_FOUND.getMessage())));
+                .switchIfEmpty(Mono.error(new RuntimeException(MEMBER_NOT_FOUND.getMessage())))
+                .flatMapMany(member -> postRepository.findByMemberId(member.getMemberId()));
     }
 }

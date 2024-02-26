@@ -3,7 +3,6 @@ package com.springboot.webflux.service;
 import com.springboot.webflux.dto.CommentEditRequest;
 import com.springboot.webflux.dto.CommentRegisterRequest;
 import com.springboot.webflux.entity.Comment;
-import com.springboot.webflux.entity.Member;
 import com.springboot.webflux.repository.CommentRepository;
 import com.springboot.webflux.repository.MemberRepository;
 import com.springboot.webflux.repository.PostRepository;
@@ -68,16 +67,16 @@ public class CommentService {
     }
 
     public Flux<Comment> findByMemberId(Long memberId) {
-
+         
         return memberRepository.findById(memberId)
-                .flatMapMany(member -> commentRepository.findByMemberId(member.getMemberId()))
-                .switchIfEmpty(Flux.error(new RuntimeException(MEMBER_NOT_FOUND.getMessage())));
+                .switchIfEmpty(Mono.error(new RuntimeException(MEMBER_NOT_FOUND.getMessage())))
+                .flatMapMany(member -> commentRepository.findByMemberId(member.getMemberId()));
     }
 
     public Flux<Comment> findByPostId(Long postId) {
 
         return postRepository.findById(postId)
-                .flatMapMany(post -> commentRepository.findByPostId(post.getPostId()))
-                .switchIfEmpty(Mono.error(new RuntimeException(POST_NOT_FOUND.getMessage())));
+                .switchIfEmpty(Mono.error(new RuntimeException(POST_NOT_FOUND.getMessage())))
+                .flatMapMany(post -> commentRepository.findByPostId(post.getPostId()));
     }
 }
