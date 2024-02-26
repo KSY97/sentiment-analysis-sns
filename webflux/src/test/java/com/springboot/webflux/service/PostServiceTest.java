@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -93,7 +92,6 @@ public class PostServiceTest {
     }
 
     @Nested
-    @WithMockUser
     @DisplayName("post 등록")
     class WritePost{
 
@@ -150,7 +148,6 @@ public class PostServiceTest {
     }
 
     @Nested
-    @WithMockUser
     @DisplayName("post 수정")
     class EditPost{
 
@@ -212,7 +209,6 @@ public class PostServiceTest {
     }
 
     @Nested
-    @WithMockUser
     @DisplayName("post 삭제")
     class DeletePost{
 
@@ -264,7 +260,6 @@ public class PostServiceTest {
     }
 
     @Nested
-    @WithMockUser
     @DisplayName("postId로 post 조회")
     class FindByIdPost{
 
@@ -311,7 +306,6 @@ public class PostServiceTest {
     }
 
     @Nested
-    @WithMockUser
     @DisplayName("memberId로 post 조회")
     class FindByMemberIdPost{
 
