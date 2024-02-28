@@ -5,7 +5,6 @@ import com.springboot.webflux.dto.PostRegisterRequest;
 import com.springboot.webflux.dto.PostResponse;
 import com.springboot.webflux.service.PostService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,7 +13,6 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 @RequestMapping("/posts")
 public class PostController {
 
