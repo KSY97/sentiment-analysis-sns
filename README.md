@@ -29,7 +29,7 @@
 - springboot에서 감정분석 요청이 들어오면 flask에서 감정 분석후 결과를 spring boot 서버로 다시 보내주고 db에 등록하는 과정을 거칠 예정
 
 ## ERD
-![DB_ERD](https://github.com/KSY97/sentiment-analysis-sns/assets/107971572/542c0fbb-d516-4b45-b6a3-26a32534dc5e)
+![DB_ERD](https://github.com/KSY97/sentiment-analysis-sns/assets/107971572/549f3919-fc6a-43d2-a98b-78be7768e2f9)
 
 ## 왜 webflux인가?
 동기 방식 서버가 아닌 비동기 방식의 서버인 webflux를 선택한 이유는 다음과 같다.
