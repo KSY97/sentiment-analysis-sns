@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -19,8 +22,8 @@ import reactor.core.publisher.Mono;
 @EnableWebFluxSecurity
 public class WebfluxSecurityConfiguration {
 
-    private AuthenticationManager authenticationManager;
-    private SecurityContextRepository securityContextRepository;
+    private final AuthenticationManager authenticationManager;
+    private final SecurityContextRepository securityContextRepository;
 
     public WebfluxSecurityConfiguration(AuthenticationManager authenticationManager,
                                         SecurityContextRepository securityContextRepository) {
@@ -30,9 +33,10 @@ public class WebfluxSecurityConfiguration {
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-        http.authorizeExchange((exchanges) -> exchanges
+        http.authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/member/signin", "/member/signup").permitAll()
-                        .anyExchange().authenticated()).formLogin().disable().csrf()
+                        .anyExchange().authenticated())
+                .formLogin().disable().csrf()
                 .disable().cors().and().exceptionHandling()
                 .authenticationEntryPoint((swe, e) -> Mono
                         .fromRunnable(() -> swe.getResponse().setStatusCode(
@@ -42,6 +46,16 @@ public class WebfluxSecurityConfiguration {
                 .and().authenticationManager(authenticationManager)
                 .securityContextRepository(securityContextRepository);
         return http.build();
+    }
+
+    @Bean
+    public MapReactiveUserDetailsService userDetailsService(){
+        UserDetails user = User
+                .withUsername("user")
+                .password(passwordEncoder().encode("password"))
+                .roles("USER")
+                .build();
+        return new MapReactiveUserDetailsService(user);
     }
 
     @Bean

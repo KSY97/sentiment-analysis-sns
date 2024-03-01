@@ -1,13 +1,15 @@
 package com.springboot.webflux.controller;
 
-import com.springboot.webflux.dto.MemberRequest;
+import com.springboot.webflux.dto.MemberEditRequest;
 import com.springboot.webflux.dto.MemberResponse;
-import com.springboot.webflux.security.CustomUserPrincipal;
+import com.springboot.webflux.dto.MemberSignInRequest;
+import com.springboot.webflux.dto.MemberSignUpRequest;
 import com.springboot.webflux.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,32 +18,36 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping
+    @GetMapping("/{memberId}")
     public Mono<MemberResponse> findById(
-            @RequestParam("member_id") Long memberId
+            @PathVariable Long memberId
     ){
-        return memberService.findById(memberId);
+        return memberService.findById(memberId)
+                .map(MemberResponse::fromEntity);
     }
 
     @PostMapping("/signup")
     public Mono<MemberResponse> signUp(
-            @RequestBody MemberRequest.SignUp request
+            @RequestBody MemberSignUpRequest request
     ){
-        return memberService.signUp(request);
+        return memberService.signUp(request)
+                .map(MemberResponse::fromEntity);
     }
 
     @PostMapping("/signin")
     public Mono<String> signIn(
-            @RequestBody MemberRequest.SignIn request
+            @RequestBody MemberSignInRequest request
     ){
         return memberService.signIn(request);
     }
 
-    @PutMapping("/edit")
+    @PatchMapping
     public Mono<MemberResponse> edit(
-            @RequestBody MemberRequest.Edit request,
-            @AuthenticationPrincipal CustomUserPrincipal principal
+            @RequestBody MemberEditRequest request,
+            Mono<Principal> principalMono
     ){
-        return memberService.edit(request, principal.getMember().getMemberId());
+        return principalMono
+                .flatMap(principal -> memberService.edit(request, principal.getName()))
+                .map(MemberResponse::fromEntity);
     }
 }

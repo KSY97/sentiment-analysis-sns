@@ -1,7 +1,8 @@
-package com.springboot.webflux.repository.entity;
+package com.springboot.webflux.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 
 @Table("post")
 @Getter
+@Setter
 @Builder
 public class Post {
 
@@ -37,14 +39,4 @@ public class Post {
     @LastModifiedDate
     @Column("edited_at")
     private LocalDateTime editedAt;
-
-    public void updatePost(String contents){
-        this.contents = contents;
-        this.editedAt = LocalDateTime.now();
-    }
-
-    public void updatePrediction(String result, Float percent){
-        this.predictResult = result;
-        this.predictPercent = percent;
-    }
 }

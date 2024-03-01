@@ -1,7 +1,8 @@
 package com.springboot.webflux.service;
 
-import com.springboot.webflux.dto.PostRequest;
-import com.springboot.webflux.dto.PostResponse;
+import com.springboot.webflux.dto.PostEditRequest;
+import com.springboot.webflux.dto.PostRegisterRequest;
+import com.springboot.webflux.entity.Post;
 import com.springboot.webflux.repository.MemberRepository;
 import com.springboot.webflux.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,81 +10,62 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
+import static com.springboot.webflux.constants.ExceptionStatus.*;
+
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-    private final PredictionService.PostPredict postPredictionService;
+    private final PostPredictionService postPredictionService;
 
-    public Mono<PostResponse> write(PostRequest.Write postRequest, Long memberId) {
+    public Mono<Post> write(PostRegisterRequest postRequest, String username) {
 
         return memberRepository.findById(postRequest.getMemberId())
-                .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 사용자 입니다.")))
-                .flatMap(member -> {
-                    if(!(memberId == null)){
-                        if(!(member.getMemberId() == memberId)){
-                            return Mono.error(new RuntimeException("권한이 없습니다."));
-                        }
-                    }
-                    return Mono.just(member);
-                })
+                .filter(member -> member.getUsername().equals(username))
+                .switchIfEmpty(Mono.error(new RuntimeException(INVALID_REQUEST.getMessage())))
                 .flatMap(member -> postRepository.save(postRequest.toEntity()))
-                .flatMap(savedPost -> postPredictionService.callApiAndSave(savedPost))
-                .map(PostResponse::fromEntity);
-
+                .flatMap(postPredictionService::callSentimentAnalysisApiAndSaveResultForRegister);
     }
 
-    public Mono<PostResponse> edit(PostRequest.Edit postRequest, Long memberId){
+    public Mono<Post> edit(PostEditRequest postRequest, String username){
 
         return postRepository.findById(postRequest.getPostId())
-                .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 게시물 입니다.")))
-                .flatMap(post -> {
-                    if(!(memberId == null)){
-                        if(!(post.getMemberId() == memberId)){
-                            return Mono.error(new RuntimeException("권한이 없습니다."));
-                        }
-                    }
-                    return Mono.just(post);
-                })
-                .flatMap(post -> {
-                    post.updatePost(postRequest.getContents());
+                .zipWhen(post -> memberRepository.findById(post.getMemberId()))
+                .filter(tuple -> tuple.getT2().getUsername().equals(username))
+                .switchIfEmpty(Mono.error(new RuntimeException(INVALID_REQUEST.getMessage())))
+                .flatMap(tuple -> {
+                    Post post = tuple.getT1();
+
+                    post.setContents(postRequest.getContents());
+                    post.setEditedAt(LocalDateTime.now());
                     return postRepository.save(post);
                 })
-                .flatMap(savedPost -> postPredictionService.callApiAndSave(savedPost))
-                .map(PostResponse::fromEntity);
+                .flatMap(postPredictionService::callSentimentAnalysisApiAndSaveResultForEdit);
     }
 
-    public Mono<Void> delete(Long postId, Long memberId){
+    public Mono<Void> delete(Long postId, String username){
 
         return postRepository.findById(postId)
-                .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 게시물 입니다.")))
-                .flatMap(post -> {
-                    if(!(memberId == null)){
-                        if(!(post.getMemberId() == memberId)){
-                            return Mono.error(new RuntimeException("권한이 없습니다."));
-                        }
-                    }
-                    return Mono.just(post);
-                })
-                .flatMap(postRepository::delete);
+                .zipWhen(post -> memberRepository.findById(post.getMemberId()))
+                .filter(tuple -> tuple.getT2().getUsername().equals(username))
+                .switchIfEmpty(Mono.error(new RuntimeException(INVALID_REQUEST.getMessage())))
+                .flatMap(tuple -> postRepository.delete(tuple.getT1()));
     }
 
-    public Mono<PostResponse> findById(Long postId) {
+    public Mono<Post> findById(Long postId) {
 
         return postRepository.findById(postId)
-                .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 게시글 입니다.")))
-                .map(PostResponse::fromEntity);
+                .switchIfEmpty(Mono.error(new RuntimeException(POST_NOT_FOUND.getMessage())));
     }
 
-    public Flux<PostResponse> findByMemberId(Long memberId){
+    public Flux<Post> findByMemberId(Long memberId){
 
         return memberRepository.findById(memberId)
-                .switchIfEmpty(Mono.error(new RuntimeException("존재하지 않는 사용자 입니다.")))
-                .flatMapMany(member ->
-                        postRepository.findByMemberId(member.getMemberId())
-                )
-                .map(PostResponse::fromEntity);
+                .switchIfEmpty(Mono.error(new RuntimeException(MEMBER_NOT_FOUND.getMessage())))
+                .flatMapMany(member -> postRepository.findByMemberId(member.getMemberId()));
     }
 }

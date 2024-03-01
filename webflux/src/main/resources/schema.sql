@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS member
     member_id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     password VARCHAR(50) NOT NULL,
+    activity_count LONG,
     positive_rate FLOAT,
     registered_at DATETIME NOT NULL
 );

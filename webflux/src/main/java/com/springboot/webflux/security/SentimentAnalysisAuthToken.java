@@ -1,5 +1,5 @@
 package com.springboot.webflux.security;
 
-public class AuthToken {
+public class SentimentAnalysisAuthToken {
     public static String token;
 }

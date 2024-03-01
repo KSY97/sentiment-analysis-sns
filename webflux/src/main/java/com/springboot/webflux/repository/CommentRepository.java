@@ -1,6 +1,6 @@
 package com.springboot.webflux.repository;
 
-import com.springboot.webflux.repository.entity.Comment;
+import com.springboot.webflux.entity.Comment;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 
