@@ -29,7 +29,7 @@ public class PostPredictionService {
 
     private final JSONParser parser = new JSONParser();
 
-    private final static String PREDICTION_URI = "/api/tospring";
+    private final static String PREDICTION_URI = "/api/analysis";
     private final static String TOKEN_URI = "/auth/token";
     private final static String POSITIVE = "positive";
     private final static String PERCENTAGE = "percentage";
