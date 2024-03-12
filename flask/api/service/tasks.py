@@ -15,12 +15,12 @@ tokenizer = Tokenizer()
 
 loaded_model = load_model('./static/best_model.h5')
 prepro_configs = json.load(open('./static/'+DATA_CONFIGS, 'r', encoding='UTF-8'))
+word_vocab = prepro_configs['vocab']
+tokenizer.fit_on_texts(word_vocab)
 
 @shared_task(ignore_result=False)
 def sentiment_predict(new_sentence):
 
-    word_vocab = prepro_configs['vocab']
-    tokenizer.fit_on_texts(word_vocab)
     new_sentence = okt.morphs(new_sentence, stem=True) # 토큰화
     new_sentence = [word for word in new_sentence if not word in current_app.config['STOPWORDS']] # 불용어 제거
     encoded = tokenizer.texts_to_sequences([new_sentence]) # 정수 인코딩
